@@ -1,17 +1,21 @@
+import truthtable.TruthTable;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AssociativeProcessor {
-    List<String> associativeMemory = new ArrayList<>();
-    int wordsCount;
-    int bitsCount;
+    private final List<String> associativeMemory = new ArrayList<>();
+    private final int bitsCount;
 
     public AssociativeProcessor(int wordsCount, int bitsCount) {
-        this.wordsCount = wordsCount;
         this.bitsCount = bitsCount;
 
         fillAssociativeMemory(wordsCount, bitsCount);
+    }
+
+    public List<String> getAssociativeMemory() {
+        return associativeMemory;
     }
 
     private void fillAssociativeMemory(int wordsCount, int bitsCount) {
@@ -37,9 +41,8 @@ public class AssociativeProcessor {
         return lValue ? 1 : 0;
     }
 
-    public int compare(String word, String argument) {
-        List<Integer> qValues = new ArrayList<>();
-        List<Integer> lValues = new ArrayList<>();
+    private int compare(String word, String argument) {
+        if (word.length() != argument.length()) return -2;
 
         int prevLValue = 0;
         int prevQValue = 0;
@@ -48,16 +51,9 @@ public class AssociativeProcessor {
             int qValue = getQValue(prevQValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevLValue);
             int lValue = getLValue(prevLValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevQValue);
 
-            qValues.add(qValue);
-            lValues.add(lValue);
-
             prevLValue = lValue;
             prevQValue = qValue;
         }
-
-        System.out.println("word is " + word + " argument is " + argument);
-        System.out.println("q_i_j: " + qValues);
-        System.out.println("l_i_j: " + lValues);
 
         return Integer.compare(prevQValue, prevLValue);
     }
@@ -72,14 +68,14 @@ public class AssociativeProcessor {
             String maxWord = findMaxWord(memoryContent);
 
             if (Objects.equals(minWord, maxWord)) {
-                minWords.add(minWord);
+                IntStream.range(0, Collections.frequency(memoryContent, minWord)).forEach(i -> minWords.add(minWord));
                 break;
             }
 
             IntStream.range(0, Collections.frequency(memoryContent, minWord)).forEach(i -> minWords.add(minWord));
-            memoryContent.remove(minWord);
+            memoryContent.removeAll(minWords);
             IntStream.range(0, Collections.frequency(memoryContent, maxWord)).forEach(i -> maxWords.add(0, maxWord));
-            memoryContent.remove(maxWord);
+            memoryContent.removeAll(maxWords);
         }
         memoryContent.clear();
         memoryContent.addAll(minWords);
@@ -87,6 +83,33 @@ public class AssociativeProcessor {
 
         return memoryContent;
     }
+
+    public String booleanFunctionSearch(String function) {
+        TruthTable table = new TruthTable(function);
+        String tableValue = table.getTableValue(table.getOperandsNumber());
+
+        for (String word : associativeMemory) {
+            int comparingResult = compare(word, tableValue);
+
+            if (comparingResult != 0) {
+                continue;
+            }
+
+            System.out.println("Search according to the boolean function finished successfully, the appropriate word " + word + " was found");
+            return word;
+        }
+        System.out.println("Search according to the boolean function finished unsuccessfully, the appropriate word " + tableValue + " was not found");
+        return "";
+    }
+
+    public List<String> sortMaxToMin() {
+        List<String> memoryContent = new ArrayList<>(sortMinToMax());
+        Collections.reverse(memoryContent);
+
+        return memoryContent;
+    }
+
+
 
     private String findMinWord(List<String> range) {
         int iter = range.size()-1;
