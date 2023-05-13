@@ -29,14 +29,14 @@ public class AssociativeProcessor {
         }
     }
 
-    private int getQValue(int prevQValue, int aValue, int sValue, int prevLValue) {
-        boolean qValue = toBoolean(prevQValue) || ((!toBoolean(aValue) && toBoolean(sValue)) && !toBoolean(prevLValue));
+    private int getGValue(int prevGValue, int aValue, int sValue, int prevLValue) {
+        boolean gValue = toBoolean(prevGValue) || ((!toBoolean(aValue) && toBoolean(sValue)) && !toBoolean(prevLValue));
 
-        return qValue ? 1 : 0;
+        return gValue ? 1 : 0;
     }
 
-    private int getLValue(int prevLValue, int aValue, int sValue, int prevQValue) {
-        boolean lValue = toBoolean(prevLValue) || ((toBoolean(aValue) && !toBoolean(sValue)) && !toBoolean(prevQValue));
+    private int getLValue(int prevLValue, int aValue, int sValue, int prevGValue) {
+        boolean lValue = toBoolean(prevLValue) || ((toBoolean(aValue) && !toBoolean(sValue)) && !toBoolean(prevGValue));
 
         return lValue ? 1 : 0;
     }
@@ -45,17 +45,17 @@ public class AssociativeProcessor {
         if (word.length() != argument.length()) return -2;
 
         int prevLValue = 0;
-        int prevQValue = 0;
+        int prevGValue = 0;
 
         for (int bit = 0; bit < bitsCount; bit++) {
-            int qValue = getQValue(prevQValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevLValue);
-            int lValue = getLValue(prevLValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevQValue);
+            int gValue = getGValue(prevGValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevLValue);
+            int lValue = getLValue(prevLValue, toInt(argument.charAt(bit)), toInt(word.charAt(bit)), prevGValue);
 
             prevLValue = lValue;
-            prevQValue = qValue;
+            prevGValue = gValue;
         }
 
-        return Integer.compare(prevQValue, prevLValue);
+        return Integer.compare(prevGValue, prevLValue);
     }
 
     public List<String> sortMinToMax() {
