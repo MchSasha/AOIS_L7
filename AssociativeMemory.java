@@ -14,15 +14,15 @@ public class AssociativeMemory {
     public static final int BITS = 16;
 
     public AssociativeMemory() {
-        fillAssociativeMemory(BITS);
+        fillAssociativeMemory();
         diagonalAssociativeMemory = toDiagonalAddressing();
     }
 
 
 
-    private void fillAssociativeMemory(int bitsCount) {
-        for (int wordsCounter = 0; wordsCounter < bitsCount; wordsCounter++) {
-            String newWord = IntStream.range(0, bitsCount)
+    private void fillAssociativeMemory() {
+        for (int wordsCounter = 0; wordsCounter < AssociativeMemory.BITS; wordsCounter++) {
+            String newWord = IntStream.range(0, AssociativeMemory.BITS)
                     .mapToObj(i -> new Random().nextInt(2))
                     .map(String::valueOf)
                     .collect(Collectors.joining());
@@ -114,7 +114,7 @@ public class AssociativeMemory {
         StringBuilder result = new StringBuilder();
 
         for (String word : associativeMemory) {
-            result.append(word.charAt(0));
+            result.append(word.charAt(bit));
         }
 
         return result.toString();
